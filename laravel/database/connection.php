@@ -318,6 +318,11 @@ class Connection {
 					else if(is_string($transformFn))
 					{ 
 						//if the value's a string, just copy the column value
+						//if the value's a string, just copy the column value
+						if(!array_key_exists($transformFn, $row)) 
+							throw new \Exception('Could not find key "'.$transformFn.'" in row:'.
+								print_r($row,true)); 
+						
 						$transformRow[$key] = $row[$transformFn];
 					}
 				}
