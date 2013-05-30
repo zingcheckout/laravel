@@ -270,7 +270,13 @@ class Connection {
 		// the connections actively being used by the application.
 		if (Config::get('database.profile'))
 		{
-			$this->log($sql, $bindings, $start);
+			if(Config::get('database.log_query_backtrace')) { 
+				$backtrace = debug_backtrace(); 
+			} else { 
+				$backtrace = null; 
+			}
+			
+			$this->log($sql, $bindings, $start, $backtrace);
 		}
 
 		return array($statement, $result);
@@ -306,11 +312,11 @@ class Connection {
 	 * @param  int     $start
 	 * @return void
 	 */
-	protected function log($sql, $bindings, $start)
+	protected function log($sql, $bindings, $start, $backtrace = null)
 	{
 		$time = number_format((microtime(true) - $start) * 1000, 2);
 
-		Event::fire('laravel.query', array($sql, $bindings, $time));
+		Event::fire('laravel.query', array($sql, $bindings, $time, $backtrace));
 
 		static::$queries[] = compact('sql', 'bindings', 'time');
 	}
