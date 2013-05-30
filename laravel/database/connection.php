@@ -257,14 +257,14 @@ class Connection {
 		try
 		{
 			
-			$statementHashKey = static::statementHashKey($sql); 
+			// $statementHashKey = static::statementHashKey($sql); 
 
-			if(array_key_exists($statementHashKey, static::$statementCache)) { 
-				$statement = static::$statementCache[$statementHashKey]; 
-			} else { 
+			// if(array_key_exists($statementHashKey, static::$statementCache)) { 
+			// 	$statement = static::$statementCache[$statementHashKey]; 
+			// } else { 
 				$statement = $this->pdo->prepare($sql);
-				static::$statementCache[$statementHashKey] = $statement; 
-			}
+			// 	static::$statementCache[$statementHashKey] = $statement; 
+			// }
 
 			
 
