@@ -206,6 +206,12 @@ class Connection {
 		}
 	}
 
+	public static $statementCache; //initialized below class definition
+
+	public static function statementHashKey($sql) { 
+		return $sql; 	
+	}
+
 	/**
 	 * Execute a SQL query against the connection.
 	 *
@@ -217,6 +223,7 @@ class Connection {
 	 */
 	protected function execute($sql, $bindings = array())
 	{
+		$start = microtime(true);
 		$bindings = (array) $bindings;
 
 		// Since expressions are injected into the query as strings, we need to
@@ -249,9 +256,17 @@ class Connection {
 		// set the message to include the SQL and query bindings.
 		try
 		{
-			$statement = $this->pdo->prepare($sql);
+			
+			$statementHashKey = static::statementHashKey($sql); 
 
-			$start = microtime(true);
+			if(array_key_exists($statementHashKey, static::$statementCache)) { 
+				$statement = static::$statementCache[$statementHashKey]; 
+			} else { 
+				$statement = $this->pdo->prepare($sql);
+				static::$statementCache[$statementHashKey] = $statement; 
+			}
+
+			
 
 			$result = $statement->execute($bindings);
 		}
@@ -383,3 +398,5 @@ class Connection {
 	}
 
 }
+
+Connection::$statementCache = array(); 
