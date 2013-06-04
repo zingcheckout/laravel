@@ -156,7 +156,11 @@ class Grammar extends \Laravel\Database\Grammar {
 
 			$clauses = implode(' ', $clauses);
 
-			$sql[] = "{$join->type} JOIN {$table} ON {$clauses}";
+			if($join->type === 'CROSS')	{ 
+				$sql[] = "{$join->type} JOIN {$table}";	
+			} else { 
+				$sql[] = "{$join->type} JOIN {$table} ON {$clauses}";	
+			}
 		}
 
 		// Finally, we should have an array of JOIN clauses that we can

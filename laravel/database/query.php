@@ -215,6 +215,20 @@ class Query {
 	}
 
 	/**
+	 * Add a cross join to the query.
+	 *
+	 * @param  string  $table
+	 * @param  string  $column1
+	 * @param  string  $operator
+	 * @param  string  $column2
+	 * @return Query
+	 */
+	public function cross_join($table)
+	{
+		return $this->join($table, null, null, null, 'CROSS');
+	}
+
+	/**
 	 * Reset the where clause to its initial state.
 	 *
 	 * @return void
