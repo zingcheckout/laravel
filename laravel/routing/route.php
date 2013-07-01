@@ -343,6 +343,18 @@ class Route {
 	}
 
 	/**
+	 * Register an OPTIONS route with the router.
+	 *
+	 * @param  string|array  $route
+	 * @param  mixed         $action
+	 * @return void
+	 */
+	public static function options($route, $action)
+	{
+		Router::register('OPTIONS', $route, $action);
+	}
+
+	/**
 	 * Register a route that handles any request method.
 	 *
 	 * @param  string|array  $route
