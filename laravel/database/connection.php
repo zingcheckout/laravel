@@ -297,6 +297,33 @@ class Connection {
 		return array($statement, $result);
 	}
 
+	public static function applyRowTransform($row, $transform) { 
+		$transformRow = array();	
+
+		//loop through $transform to get our new key names and values
+		foreach($transform as $key => $transformFn) 
+		{ 
+			//check the type of $transformFn
+			if(is_callable($transformFn)) 
+			{
+				//if the value's a closure, execute it
+				$transformRow[$key] = $transformFn($row);
+			} 
+			else if(is_string($transformFn))
+			{ 
+				//if the value's a string, just copy the column value
+				//if the value's a string, just copy the column value
+				if(!array_key_exists($transformFn, $row)) 
+					throw new \Exception('Could not find key "'.$transformFn.'" in row:'.
+						print_r($row,true)); 
+				
+				$transformRow[$key] = $row[$transformFn];
+			}
+		}
+
+		return $transformRow; 
+	}
+
 	/**
 	 * Fetch all of the rows for a given statement.
 	 *
@@ -306,51 +333,27 @@ class Connection {
 	 */
 	protected function fetch($statement, $style, $transform = NULL)
 	{
-		if($transform == NULL) 
-		{
+		//If no transform was specified, just fetch the rows as-usual
+		if($transform == NULL) {
 			//Use PDOStatement::fetchAll if no transform is necessary
 			 
 			// If the fetch style is "class", we'll hydrate an array of PHP
 			// stdClass objects as generic containers for the query rows,
 			// otherwise we'll just use the fetch style value.
-			if ($style === PDO::FETCH_CLASS)
-			{
+			if ($style === PDO::FETCH_CLASS) {
 				return $statement->fetchAll(PDO::FETCH_CLASS, 'stdClass');
 			}
-			else
-			{
+			else {
 				return $statement->fetchAll($style);
 			}
 		} else { 
 			$results = array(); 
 			while($row = $statement->fetch(PDO::FETCH_ASSOC)) 
 			{ 
-				$transformRow = array();	
+				$transformRow = static::applyRowTransform($row, $transform); 
 
-				//loop through $transform to get our new key names and values
-				foreach($transform as $key => $transformFn) 
-				{ 
-					//check the type of $transformFn
-					if(is_callable($transformFn)) 
-					{
-						//if the value's a closure, execute it
-						$transformRow[$key] = $transformFn($row);
-					} 
-					else if(is_string($transformFn))
-					{ 
-						//if the value's a string, just copy the column value
-						//if the value's a string, just copy the column value
-						if(!array_key_exists($transformFn, $row)) 
-							throw new \Exception('Could not find key "'.$transformFn.'" in row:'.
-								print_r($row,true)); 
-						
-						$transformRow[$key] = $row[$transformFn];
-					}
-				}
-				
 				//if style is configured to be stdClass, convert from assoc
-				if($style == PDO::FETCH_CLASS) 
-				{ 
+				if($style == PDO::FETCH_CLASS) { 
 					$transformRow = (object) $transformRow;
 				} 
 				
