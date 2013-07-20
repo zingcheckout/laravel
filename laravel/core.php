@@ -181,8 +181,11 @@ if (Request::cli())
 else
 {
 	$root = Request::foundation()->getRootUrl();
-
 	$environment = Request::detect_env($environments, $root);
+
+	if(!isset($environment) && $opsWorks == null) { 
+		$environment = 'local'; //XXX zing-specific hack: use local environment if opsworks variable isn't present
+	}
 }
 
 /*
