@@ -17,6 +17,10 @@ class Error {
 
 		$message = $exception->getMessage();
 
+		if (extension_loaded('newrelic')) {
+			newrelic_notice_error($message, $exception);
+		}
+
 		// For Laravel view errors we want to show a prettier error:
 		$file = $exception->getFile();
 
